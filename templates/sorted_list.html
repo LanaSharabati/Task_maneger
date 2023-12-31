@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorted Task List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #f9f9f9;
+            margin: 4px 0;
+            padding: 8px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        a {
+            margin-left: 8px;
+            text-decoration: none;
+            color: #555;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .back-button {
+            display: block;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sorted Task List</h1>
+
+    <a href="{{ url_for('index') }}" class="back-button">Back to Home</a>
+
+    <ul>
+        {% for task in sorted_tasks %}
+            <li>
+                {{ task['task'] }} (Due: {{ task['due_date'] }}) - Status: {{ task['status'] }}
+                <div>
+                    Votes: {{ task['votes'] }}
+                    <a href="{{ url_for('upvote', task_key=task_key) }}">Increase Complexity</a>
+                    <a href="{{ url_for('downvote', task_key=task_key) }}">Decrease Complexity</a>
+                </div>
+                <a href="{{ url_for('move', task_key=task_key, new_status='In Review') }}">Move to In Review</a>
+                <a href="{{ url_for('move', task_key=task_key, new_status='Done') }}">Move to Done</a>
+                <a href="{{ url_for('delete', task_key=task_key) }}">Delete</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

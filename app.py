@@ -11,6 +11,12 @@ def generate_task_key(task):
     task_key = f"{task_name}_{due_date}"
     return task_key
 
+
+def generate_cache_key(sort_by):
+    return f'tasks:sorted_by_{sort_by}'
+
+
+
 @app.route('/')
 def index():
     all_task_keys = mc.get('all_task_keys') or []
@@ -27,53 +33,106 @@ def index():
     
     return render_template('index.html', blocked_tasks=blocked_tasks, in_review_tasks=in_review_tasks, done_tasks=done_tasks)
 
+
 @app.route('/add', methods=['POST'])
 def add():
     new_task = {
         'task': request.form.get('task'),
         'due_date': request.form.get('due_date'),
-        'status': 'Blocked'  # Default status is set to 'Blocked'
+        'status': 'Blocked',
+        'votes': 0  # Default votes is set to 0
     }
 
-    # Extract TTL from the form data, or set a default value if not provided
-    ttl = int(request.form.get('expiration_time', 60))  # Default TTL is 60 seconds
+    ttl = int(request.form.get('expiration_time', 60))
 
-    # Generate a unique key for the new task
     task_key = generate_task_key(new_task)
 
-    # Store the task in Memcached using the generated key and set TTL
-    mc.set(task_key, new_task, time=ttl)
+    if mc.get(task_key) is not None:
+        mc.replace(task_key, new_task, time=ttl)
+    else:
+        mc.set(task_key, new_task, time=ttl)
 
-    # Update the list of all task keys
-    all_task_keys = mc.get('all_task_keys') or []
-    all_task_keys.append(task_key)
-    mc.set('all_task_keys', all_task_keys)
+        all_task_keys = mc.get('all_task_keys') or []
+        all_task_keys.append(task_key)
+        mc.set('all_task_keys', all_task_keys)
 
     return redirect(url_for('index'))
 
+@app.route('/upvote/<task_key>')
+def upvote(task_key):
+    tasks = mc.get(task_key)
+    mc.set_multi(tasks)
+
+    if tasks:
+        mc.incr('votes',1)
+        # Increment the 'votes' field to simulate upvoting
+        tasks['votes'] = mc.get('votes')
+        mc.replace(task_key, tasks)
+
+    return redirect(url_for('index'))
+
+@app.route('/downvote/<task_key>')
+def downvote(task_key):
+    tasks = mc.get(task_key)
+    mc.set_multi(tasks)
+
+    if tasks:
+        mc.decr('votes',1)
+        # Decrement the 'votes' field, ensuring it doesn't go below 0 (simulate downvoting)
+        tasks['votes'] = mc.get('votes')
+        mc.replace(task_key, tasks)
+
+    return redirect(url_for('index'))
+
+@app.route('/sort-and-show/<sort_by>')
+def sort_and_show_combined(sort_by):
+    sorted_key = f'sorted_{sort_by}'
+    all_task_keys = mc.get('all_task_keys') or []
+
+    tasks = {key: mc.get(key) for key in all_task_keys if mc.get(key) is not None}
+
+    if sort_by == 'due_date':
+        sorted_tasks = sorted(tasks.values(), key=lambda x: x['due_date'])
+    elif sort_by == 'votes':
+        sorted_tasks = sorted(tasks.values(), key=lambda x: x.get('votes', 0), reverse=True)
+
+    # Set an appropriate expiration time, e.g., 300 seconds (5 minutes)
+    expiration_time = 300
+    mc.set(sorted_key, sorted_tasks, time=expiration_time)
+
+    return render_template('sorted_list.html', sorted_tasks=sorted_tasks)
+
+
+
+@app.route('/sort-and-show/<sort_by>')
+def sort_and_show(sort_by):
+    sorted_key = f'sorted_{sort_by}'
+    sorted_tasks = mc.get(sorted_key) or []
+
+    return render_template('sorted_list.html', sorted_tasks=sorted_tasks)
+
+
 @app.route('/move/<task_key>/<new_status>')
 def move(task_key, new_status):
-    tasks = mc.get(task_key)  # Retrieve the individual task using its key
+    tasks = mc.get(task_key)
     all_task_keys = mc.get('all_task_keys') or []
 
     if task_key in all_task_keys and tasks:
         tasks['status'] = new_status
-        mc.set(task_key, tasks)
+        mc.replace(task_key, tasks)
 
     return redirect(url_for('index'))
 
 @app.route('/delete/<task_key>')
 def delete(task_key):
-    tasks = mc.get(task_key)  # Retrieve the individual task using its key
+    tasks = mc.get(task_key)
     all_task_keys = mc.get('all_task_keys') or []
 
     if task_key in all_task_keys:
-        # Remove the task key from the list of all task keys
         all_task_keys.remove(task_key)
         mc.set('all_task_keys', all_task_keys)
 
     if tasks:
-        # Delete the individual task
         mc.delete(task_key)
 
     return redirect(url_for('index'))

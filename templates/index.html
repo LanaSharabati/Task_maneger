@@ -57,6 +57,9 @@
             margin: 4px 0;
             padding: 8px;
             border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         a {
@@ -74,6 +77,15 @@
         }
     </style>
 </head>
+<script>
+    function sortAndShow(sortBy) {
+        if (sortBy === 'due_date' || sortBy === 'votes') {
+            window.location.href = `/sort-and-show/${sortBy}`;
+        }
+    }
+</script>
+
+
 <body>
     <h1>Task Manager</h1>
     
@@ -89,7 +101,11 @@
     
         <button type="submit">Add</button>
     </form>
-    
+
+    <button onclick="sortAndShow('due_date')">Sort and Show</button>
+    <button onclick="sortAndShow('votes')">Sort and Show</button>
+
+
 
     <div class="task-container">
         <div class="task-list">
@@ -98,6 +114,11 @@
                 {% for task_key, task in blocked_tasks.items() %}
                     <li>
                         {{ task['task'] }} (Due: {{ task['due_date'] }})
+                        <div>
+                            Votes: {{ task['votes'] }}
+                            <a href="{{ url_for('upvote', task_key=task_key) }}">Increase Complexity</a>
+                            <a href="{{ url_for('downvote', task_key=task_key) }}">Decrease Complexity</a>
+                        </div>
                         <a href="{{ url_for('move', task_key=task_key, new_status='In Review') }}">Move to In Review</a>
                         <a href="{{ url_for('move', task_key=task_key, new_status='Done') }}">Move to Done</a>
                         <a href="{{ url_for('delete', task_key=task_key) }}">Delete</a>
@@ -112,6 +133,11 @@
                 {% for task_key, task in in_review_tasks.items() %}
                     <li>
                         {{ task['task'] }} (Due: {{ task['due_date'] }})
+                        <div>
+                            Votes: {{ task['votes'] }}
+                            <a href="{{ url_for('upvote', task_key=task_key) }}">Increase Complexity</a>
+                            <a href="{{ url_for('downvote', task_key=task_key) }}">Decrease Complexity</a>
+                        </div>
                         <a href="{{ url_for('move', task_key=task_key, new_status='Blocked') }}">Move to Blocked</a>
                         <a href="{{ url_for('move', task_key=task_key, new_status='Done') }}">Move to Done</a>
                         <a href="{{ url_for('delete', task_key=task_key) }}">Delete</a>
@@ -126,6 +152,11 @@
                 {% for task_key, task in done_tasks.items() %}
                     <li>
                         {{ task['task'] }} (Due: {{ task['due_date'] }})
+                        <div>
+                            Votes: {{ task['votes'] }}
+                            <a href="{{ url_for('upvote', task_key=task_key) }}">Increase Complexity</a>
+                            <a href="{{ url_for('downvote', task_key=task_key) }}">Decrease Complexity</a>
+                        </div>
                         <a href="{{ url_for('move', task_key=task_key, new_status='Blocked') }}">Move to Blocked</a>
                         <a href="{{ url_for('move', task_key=task_key, new_status='In Review') }}">Move to In Review</a>
                         <a href="{{ url_for('delete', task_key=task_key) }}">Delete</a>
