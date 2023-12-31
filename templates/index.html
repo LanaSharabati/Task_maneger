@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        label {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input, button {
+            margin-bottom: 16px;
+            padding: 8px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        div.task-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        div.task-list {
+            width: 30%;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #f9f9f9;
+            margin: 4px 0;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        a {
+            margin-left: 8px;
+            text-decoration: none;
+            color: #555;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        h2 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Task Manager</h1>
+    
+    <form action="/add" method="post">
+        <label for="task">Add Task:</label>
+        <input type="text" id="task" name="task" required>
+    
+        <label for="due_date">Due Date:</label>
+        <input type="date" id="due_date" name="due_date" required>
+
+        <label for="expiration_time">Expiration Time (in seconds):</label>
+        <input type="number" id="expiration_time" name="expiration_time" value="60" required>
+    
+        <button type="submit">Add</button>
+    </form>
+    
+
+    <div class="task-container">
+        <div class="task-list">
+            <h2>Blocked</h2>
+            <ul>
+                {% for task_key, task in blocked_tasks.items() %}
+                    <li>
+                        {{ task['task'] }} (Due: {{ task['due_date'] }})
+                        <a href="{{ url_for('move', task_key=task_key, new_status='In Review') }}">Move to In Review</a>
+                        <a href="{{ url_for('move', task_key=task_key, new_status='Done') }}">Move to Done</a>
+                        <a href="{{ url_for('delete', task_key=task_key) }}">Delete</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="task-list">
+            <h2>In Review</h2>
+            <ul>
+                {% for task_key, task in in_review_tasks.items() %}
+                    <li>
+                        {{ task['task'] }} (Due: {{ task['due_date'] }})
+                        <a href="{{ url_for('move', task_key=task_key, new_status='Blocked') }}">Move to Blocked</a>
+                        <a href="{{ url_for('move', task_key=task_key, new_status='Done') }}">Move to Done</a>
+                        <a href="{{ url_for('delete', task_key=task_key) }}">Delete</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="task-list">
+            <h2>Done</h2>
+            <ul>
+                {% for task_key, task in done_tasks.items() %}
+                    <li>
+                        {{ task['task'] }} (Due: {{ task['due_date'] }})
+                        <a href="{{ url_for('move', task_key=task_key, new_status='Blocked') }}">Move to Blocked</a>
+                        <a href="{{ url_for('move', task_key=task_key, new_status='In Review') }}">Move to In Review</a>
+                        <a href="{{ url_for('delete', task_key=task_key) }}">Delete</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
