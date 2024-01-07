@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">Sorted Tasks</h2>
+    <ul style="list-style-type: none; padding: 0;">
+        {% for task_key, task in sorted_tasks.items() %}
+            <li style="width:100%;border: 1px solid #eee; border-radius: 10px; padding: 20px; margin-bottom: 20px; background-color: #fff; font-size: 16px;">
+                <div style="font-size: 20px; margin-bottom: 10px;">
+                    {{ task['task'] }} <span style="font-weight: normal;">(Due: {{ task['due_date'] }})</span>
+                </div>
+                <div style="font-size: 14px; color: #777; margin-bottom: 10px;">
+                    Votes: {{ task['votes'] }}
+                    <a href="{{ url_for('upvote', task_key=task_key) }}" style="margin-left: 10px; color: #4CAF50; text-decoration: none;">Increase Complexity</a>
+                    <a href="{{ url_for('downvote', task_key=task_key) }}" style="margin-left: 10px; color: #F44336; text-decoration: none;">Decrease Complexity</a>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label for="statusSelect" style="font-size: 14px; color: #333;">Change Status:</label>
+                    <select id="statusSelect" onchange="changeStatus('{{ task_key }}', this.value)" style="padding: 8px; font-size: 14px;">
+                        <option value="Blocked" {% if task['status'] == 'Blocked' %} selected {% endif %}>Blocked</option>
+                        <option value="In Review" {% if task['status'] == 'In Review' %} selected {% endif %}>In Review</option>
+                        <option value="Done" {% if task['status'] == 'Done' %} selected {% endif %}>Done</option>
+                    </select>
+                </div>
+                <a href="{{ url_for('delete', task_key=task_key) }}" style="color: #F44336; text-decoration: none; font-size: 14px;">Delete</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Key-Value Pairs</title>
+    <style>
+            body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: whitesmoke;
+        }
+
+        /* Style for the flush button */
+        form {
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+            width :300px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .home-button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            margin: auto;
+            width :500px;
+        }
+
+        .home-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+    </style>
+</head>
+<body>
+    <header>
+        <h1>All Key-Value Pairs</h1>
+    </header>
+    
+        <button ><a href="{{ url_for('index') }}" class="home-button">Home</a></button>
+    
+    <!-- Add a button to flush all items from the cache -->
+    <form action="{{ url_for('flush_cache') }}" method="post">
+        <button type="submit">Flush All Items from Cache</button>
+    </form>
+
+    <div style="width: 80%; margin: 0 auto; text-align: center; border: 1px solid #ccc; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+        <div style="width: 90%">
+            <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">All Key-Value Pairs</h2>
+            <ul style="list-style-type: none; padding: 0;">
+                {% for key, value in all_values.items() %}
+                
+                    <li style="width:100%;border: 1px solid #eee; border-radius: 10px; padding: 20px; margin-bottom: 20px; background-color: #fff; font-size: 16px;">
+                        <div style="font-size: 20px; margin-bottom: 10px;">
+                            {{ key }}
+                        </div>
+                        <div style="font-size: 14px; color: #777; margin-bottom: 10px;">
+                            {{ value }}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+   <!-- Add a section for displaying sorted key names -->
+<h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">Sorted Key Names</h2>
+<ul style="list-style-type: none; padding: 0;">
+    {% if sorted_due_date_values %}
+        <li style="margin-bottom: 10px;">Sorted Due Date Key: {{ sorted_due_date_key }}</li>
+    {% endif %}
+    {% if sorted_votes_values %}
+        <li style="margin-bottom: 10px;">Sorted Votes Key: {{ sorted_votes_key }}</li>
+    {% endif %}
+</ul>
+
+<!-- Add a section for displaying sorted key-value pairs by due date -->
+{% if sorted_due_date_values %}
+    <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">Sorted Key-Value Pairs by Due Date</h2>
+    <ul style="list-style-type: none; padding: 0;">
+        {% for task in sorted_due_date_values %}
+        <li style="width:100%;border: 1px solid #eee; border-radius: 10px; padding: 20px; margin-bottom: 20px; background-color: #fff; font-size: 16px;">
+            <div style="font-size: 20px; margin-bottom: 10px;">
+                {{ task['task'] }} <span style="font-weight: normal;">(Due: {{ task['due_date'] }})</span>
+            </div>
+            <div style="font-size: 14px; color: #777; margin-bottom: 10px;">
+                Status: {{ task['status'] }} | Votes: {{ task['votes'] }}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<!-- Add a section for displaying sorted key-value pairs by votes -->
+{% if sorted_votes_values %}
+    <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">Sorted Key-Value Pairs by Votes</h2>
+    <ul style="list-style-type: none; padding: 0;">
+        {% for task in sorted_votes_values %}
+        <li style="width:100%;border: 1px solid #eee; border-radius: 10px; padding: 20px; margin-bottom: 20px; background-color: #fff; font-size: 16px;">
+            <div style="font-size: 20px; margin-bottom: 10px;">
+                {{ task['task'] }} <span style="font-weight: normal;">(Due: {{ task['due_date'] }})</span>
+            </div>
+            <div style="font-size: 14px; color: #777; margin-bottom: 10px;">
+                Status: {{ task['status'] }} | Votes: {{ task['votes'] }}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+        </div>
+    </div>
+</body>
+</html>

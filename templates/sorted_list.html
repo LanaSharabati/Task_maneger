@@ -5,14 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorted Task List</title>
     <style>
+         body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: whitesmoke;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        label {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input, button {
+            margin-bottom: 16px;
+            padding: 8px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        div.task-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        div.task-list {
+            width: 30%;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #f9f9f9;
+            margin: 4px 0;
+            padding: 8px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        a {
+            margin-left: 8px;
+            text-decoration: none;
+            color: #555;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
 
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
         h1 {
             text-align: center;
-            color: #333;
+            color: whitesmoke;
         }
 
         ul {
@@ -52,24 +139,34 @@
     </style>
 </head>
 <body>
-    <h1>Sorted Task List</h1>
+    <header>
+        <h1>Sorted Task List</h1>
+    </header>
 
     <a href="{{ url_for('index') }}" class="back-button">Back to Home</a>
 
-    <ul>
-        {% for task in sorted_tasks %}
-            <li>
-                {{ task['task'] }} (Due: {{ task['due_date'] }}) - Status: {{ task['status'] }}
-                <div>
-                    Votes: {{ task['votes'] }}
-                    <a href="{{ url_for('upvote', task_key=task_key) }}">Increase Complexity</a>
-                    <a href="{{ url_for('downvote', task_key=task_key) }}">Decrease Complexity</a>
-                </div>
-                <a href="{{ url_for('move', task_key=task_key, new_status='In Review') }}">Move to In Review</a>
-                <a href="{{ url_for('move', task_key=task_key, new_status='Done') }}">Move to Done</a>
-                <a href="{{ url_for('delete', task_key=task_key) }}">Delete</a>
-            </li>
-        {% endfor %}
-    </ul>
+
+    <div class="task-container" style="width: 80%; margin: 0 auto; text-align: center; border: 1px solid #ccc; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+
+        <div class="task-list" style="width: 90%">
+            <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">All Tasks</h2>
+            <ul>
+                {% for task in sorted_tasks %}
+                    <li>
+                        <div style="font-size: 20px; margin-bottom: 10px;">
+                            {{ task['task'] }} 
+                        </div>
+                        <div style="font-size: 20px; margin-bottom: 10px;">
+                            <span style="font-weight: normal;">(Due: {{ task['due_date'] }})</span>
+                        </div>
+                        <div>
+                            Votes: {{ task['votes'] }}
+                            </div>
+                        
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </body>
 </html>

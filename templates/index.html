@@ -9,10 +9,17 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
 
         h1 {
             text-align: center;
-            color: #333;
+            color: whitesmoke;
         }
 
         form {
@@ -75,6 +82,9 @@
         h2 {
             color: #333;
         }
+
+        
+        
     </style>
 </head>
 <script>
@@ -87,83 +97,126 @@
 
 
 <body>
-    <h1>Task Manager</h1>
+    <header>
+        <h1>Task Manager</h1>
+    </header>
+    <!-- Add this link where you want it in index.html -->
+<a href="{{ url_for('show_all_keys') }}" style="color: #3498db; text-decoration: none; font-size: 14px;">Show All Key-Value Pairs</a>
+
     
-    <form action="/add" method="post">
-        <label for="task">Add Task:</label>
-        <input type="text" id="task" name="task" required>
+
+<form action="/add" method="post" style="width: 60%; margin: 0 auto;margin-bottom: 10px; text-align: center; border: 1px solid #ccc; padding: 20px; border-radius: 10px;">
+
+    <div style="display: flex; margin-bottom: 20px; align-items: center;">
+        <label for="task" style="width: 30%;">Add Task:</label>
+        <input type="text" id="task" name="task" required style="width: 70%; padding: 8px; box-sizing: border-box;" placeholder="Enter your task">
+    </div>
+
+    <div style="display: flex; margin-bottom: 20px; align-items: center;">
+        <label for="due_date" style="width: 30%;">Due Date:</label>
+        <input type="date" id="due_date" name="due_date" required style="width: 70%; padding: 8px; box-sizing: border-box;">
+    </div>
+
+    <div style="display: flex; margin-bottom: 20px; align-items: center;">
+        <label for="expiration_time" style="width: 30%;">Expiration Time (in seconds):</label>
+        <input type="number" id="expiration_time" name="expiration_time" value="60" required style="width: 70%; padding: 8px; box-sizing: border-box;" placeholder="Enter expiration time">
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        
+        <button type="submit" style="width: 100%; background-color: #3498db; color: white; border: none; cursor: pointer; border-radius: 10px; padding: 10px;">Add Task</button>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <button onclick="sortAndShow('due_date')"style="width: 40%;  border: none; cursor: pointer; border-radius: 10px; padding: 10px;">Sort by due Date</button>
+    <button onclick="sortAndShow('votes')"style="width: 40%;  border: none; cursor: pointer; border-radius: 10px; padding: 10px;">Sort by votes</button>
+    </div>
+
     
-        <label for="due_date">Due Date:</label>
-        <input type="date" id="due_date" name="due_date" required>
 
-        <label for="expiration_time">Expiration Time (in seconds):</label>
-        <input type="number" id="expiration_time" name="expiration_time" value="60" required>
+</form>
+
+
+
+
+
     
-        <button type="submit">Add</button>
-    </form>
 
-    <button onclick="sortAndShow('due_date')">Sort and Show</button>
-    <button onclick="sortAndShow('votes')">Sort and Show</button>
+    <div class="task-container" style="width: 99%; margin: 0 auto; text-align: center; border: 1px solid #ccc; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
 
-
-
-    <div class="task-container">
-        <div class="task-list">
-            <h2>Blocked</h2>
-            <ul>
-                {% for task_key, task in blocked_tasks.items() %}
-                    <li>
-                        {{ task['task'] }} (Due: {{ task['due_date'] }})
-                        <div>
-                            Votes: {{ task['votes'] }}
-                            <a href="{{ url_for('upvote', task_key=task_key) }}">Increase Complexity</a>
-                            <a href="{{ url_for('downvote', task_key=task_key) }}">Decrease Complexity</a>
+        <div class="task-list" style="width: 96%">
+            <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">All Tasks</h2>
+            <ul style="list-style-type: none; padding: 0;">
+                {% for task_key, task in tasks.items() %}
+                    <li style="width:100%;border: 1px solid #eee; border-radius: 10px; padding: 20px; margin-bottom: 20px; background-color: #fff; font-size: 16px;">
+                        <div style="font-size: 20px; margin-bottom: 10px;">
+                            {{ task['task'] }} <span style="font-weight: normal;">(Due: {{ task['due_date'] }})</span>
                         </div>
-                        <a href="{{ url_for('move', task_key=task_key, new_status='In Review') }}">Move to In Review</a>
-                        <a href="{{ url_for('move', task_key=task_key, new_status='Done') }}">Move to Done</a>
-                        <a href="{{ url_for('delete', task_key=task_key) }}">Delete</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="task-list">
-            <h2>In Review</h2>
-            <ul>
-                {% for task_key, task in in_review_tasks.items() %}
-                    <li>
-                        {{ task['task'] }} (Due: {{ task['due_date'] }})
-                        <div>
+                        <div style="font-size: 14px; color: #777; margin-bottom: 10px;">
                             Votes: {{ task['votes'] }}
-                            <a href="{{ url_for('upvote', task_key=task_key) }}">Increase Complexity</a>
-                            <a href="{{ url_for('downvote', task_key=task_key) }}">Decrease Complexity</a>
+                            <a href="{{ url_for('upvote', task_key=task_key) }}" style="margin-left: 10px; color: #4CAF50; text-decoration: none;">Increase Complexity</a>
+                            <a href="{{ url_for('downvote', task_key=task_key) }}" style="margin-left: 10px; color: #F44336; text-decoration: none;">Decrease Complexity</a>
                         </div>
-                        <a href="{{ url_for('move', task_key=task_key, new_status='Blocked') }}">Move to Blocked</a>
-                        <a href="{{ url_for('move', task_key=task_key, new_status='Done') }}">Move to Done</a>
-                        <a href="{{ url_for('delete', task_key=task_key) }}">Delete</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="task-list">
-            <h2>Done</h2>
-            <ul>
-                {% for task_key, task in done_tasks.items() %}
-                    <li>
-                        {{ task['task'] }} (Due: {{ task['due_date'] }})
-                        <div>
-                            Votes: {{ task['votes'] }}
-                            <a href="{{ url_for('upvote', task_key=task_key) }}">Increase Complexity</a>
-                            <a href="{{ url_for('downvote', task_key=task_key) }}">Decrease Complexity</a>
+                        <div style="margin-bottom: 10px;">
+                            <label for="statusSelect" style="font-size: 14px; color: #333;">Change Status:</label>
+                            <select id="statusSelect" onchange="changeStatus('{{ task_key }}', this.value)" style="padding: 8px; font-size: 14px;">
+                                <option value="Blocked" {% if task['status'] == 'Blocked' %} selected {% endif %}>Blocked</option>
+                                <option value="In Review" {% if task['status'] == 'In Review' %} selected {% endif %}>In Review</option>
+                                <option value="Done" {% if task['status'] == 'Done' %} selected {% endif %}>Done</option>
+                            </select>
                         </div>
-                        <a href="{{ url_for('move', task_key=task_key, new_status='Blocked') }}">Move to Blocked</a>
-                        <a href="{{ url_for('move', task_key=task_key, new_status='In Review') }}">Move to In Review</a>
-                        <a href="{{ url_for('delete', task_key=task_key) }}">Delete</a>
+                        <form action="{{ url_for('extend_expiration', task_key=task_key) }}" method="post" style="margin-top: 10px;">
+                            <label for="expiration_time">New Expiration Time (seconds):</label>
+                            <input type="number" name="expiration_time" required>
+                            <button type="submit">Extend Expiration</button>
+                        </form>
+                        <a href="{{ url_for('delete', task_key=task_key) }}" style="color: #F44336; text-decoration: none; font-size: 14px;">Delete</a>
                     </li>
                 {% endfor %}
             </ul>
         </div>
     </div>
+    
+    <script>
+        function changeStatus(taskKey, newStatus) {
+    // Make an AJAX request to the server to update the task status
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', `/move/${taskKey}/${newStatus}`, true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            // Assuming the server returns a success response
+            // You may update the UI dynamically if needed
+            alert('Status changed successfully!');
+        }
+    };
+    xhr.send();
+    
+}
+function upvote(taskKey) {
+        sendVoteRequest(taskKey, 'upvote');
+    }
+
+    function downvote(taskKey) {
+        sendVoteRequest(taskKey, 'downvote');
+    }
+
+    function sendVoteRequest(taskKey, voteType) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // The request was successful, update the UI dynamically
+                var votesElement = document.getElementById('votes_' + taskKey);
+                if (votesElement) {
+                    votesElement.innerText = xhr.responseText;
+                }
+            }
+        };
+
+        // Send a POST request to the server to handle the vote
+        xhr.open('POST', '/' + voteType + '/' + taskKey, true);
+        xhr.send();
+    }
+
+    </script>
 </body>
 </html>
