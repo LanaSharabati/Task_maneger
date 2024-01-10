@@ -9,10 +9,10 @@ The application allows users to add tasks, upvote or downvote tasks, change task
 
 ## About Memcached
 
-1 . Memcached is an open-source.
-2 . high-performance.
-3 . distributed memory caching system that is commonly used to speed up dynamic web applications by caching data and objects in memory.
-4 . It stores data in a key-value format and is designed to be simple, lightweight, and scalable.
+1. Memcached is an open-source.
+2. high-performance.
+3. distributed memory caching system that is commonly used to speed up dynamic web applications by caching data and objects in memory.
+4. It stores data in a key-value format and is designed to be simple, lightweight, and scalable.
 
 ### Why Use Memcached in Task Manager App?
 
