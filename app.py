@@ -6,20 +6,15 @@ import json
 
 
 app = Flask(__name__)
-mc = memcache.Client(['127.0.0.1:11211'], debug=0)
+mc = memcache.Client(['127.0.0.1:11211'], debug=0)#1
 
 
 
 def generate_task_key(task):
-    # Normalize data and ensure uniqueness
-    task_name = task['task'].lower().replace(' ', '-')[:20]  # Replace spaces with "-" and use the first 20 characters
-    due_date = str(task['due_date'])  # Convert due_date to string
-    votes = str(task['votes'])  # Convert votes to string
-
-    # Incorporate a timestamp or a random component for additional uniqueness
+    task_name = task['task'].lower().replace(' ', '-')[:20] 
+    due_date = str(task['due_date'])  
+    votes = str(task['votes'])  
     timestamp = str(int(time.time()))
-
-    # Use a hash function for a fixed-length key
     key_components = [task_name, due_date, votes, timestamp]
     key_string = ':'.join(key_components)
     return key_string
@@ -40,12 +35,12 @@ def index():
 
 
 @app.route('/add', methods=['POST'])
-def add():
+def add():#1
     new_task = {
         'task': request.form.get('task'),
         'due_date': request.form.get('due_date'),
         'status': 'Blocked',
-        'votes': 0  # Default votes is set to 0
+        'votes': 0 
     }
 
     ttl = int(request.form.get('expiration_time', 60))
@@ -56,7 +51,7 @@ def add():
         mc.replace(task_key, new_task, time=ttl)
     else:
         mc.set(task_key, new_task, time=ttl)
-
+#######
         all_task_keys = mc.get('all_task_keys') or []
         all_task_keys.append(task_key)
         mc.set('all_task_keys', all_task_keys)
@@ -73,7 +68,6 @@ def upvote(task_key):
 
     if tasks:
         mc.incr('votes',1)
-        # Increment the 'votes' field to simulate upvoting
         tasks['votes'] = mc.get('votes')
         mc.replace(task_key, tasks)
 
@@ -87,7 +81,6 @@ def downvote(task_key):
 
     if tasks:
         mc.decr('votes',1)
-        # Decrement the 'votes' field, ensuring it doesn't go below 0 (simulate downvoting)
         tasks['votes'] = mc.get('votes')
         mc.replace(task_key, tasks)
 
@@ -105,8 +98,6 @@ def sort_and_show_combined(sort_by):
         sorted_tasks = sorted(tasks.values(), key=lambda x: x['due_date'])
     elif sort_by == 'votes':
         sorted_tasks = sorted(tasks.values(), key=lambda x: x.get('votes', 0), reverse=True)
-
-    # Set an appropriate expiration time, e.g., 300 seconds (5 minutes)
     expiration_time = 30
     mc.set(sorted_key, sorted_tasks, time=expiration_time)
 
@@ -125,7 +116,7 @@ def move(task_key, new_status):
         tasks['status'] = new_status
         mc.replace(task_key, tasks)
 
-    return "Success"  # You can return any response indicating success to the client
+    return "Success"  
 
 
 @app.route('/delete/<task_key>')
@@ -164,25 +155,22 @@ def flush_cache():
     mc.flush_all()
     return redirect(url_for('show_all_keys'))
 
-@app.route('/memcached-stats')
-def memcached_stats():
-    try:
-        # Use mc.get_stats() instead of mc.stats()
-        stats = mc.get_stats()
-        # Extract statistics from the first server in the list (assuming you have only one server)
-        stats = stats[0][1] if stats else {}
-        return json.dumps(stats, indent=2), 200, {'Content-Type': 'application/json'}
-    except Exception as e:
-        return str(e), 500
 
 @app.route('/extend-expiration/<task_key>', methods=['POST'])
 def extend_expiration(task_key):
     ttl = int(request.form.get('expiration_time', 60))
-
-    # Use mc.touch to update the expiration time for the specified task_key
     mc.touch(task_key, time=ttl)
-
     return redirect(url_for('index'))
+
+
+@app.route('/memcached-stats')
+def memcached_stats():
+    try:
+        stats = mc.get_stats()
+        stats = stats[0][1] if stats else {}
+        return json.dumps(stats, indent=2), 200, {'Content-Type': 'application/json'}
+    except Exception as e:
+        return str(e), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

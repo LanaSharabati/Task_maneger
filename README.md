@@ -47,7 +47,7 @@ In the Task Manager app, Memcached is employed for several reasons:
 - Python 3.x
 - Flask
 - Memcached
-- A modern web browser
+
 
 ### Installing Memcached on Windows
 
